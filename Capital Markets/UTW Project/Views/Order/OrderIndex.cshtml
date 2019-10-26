@@ -1,0 +1,162 @@
+﻿
+@model Order
+@{
+    ViewBag.Title = "OrderIndex";
+}
+
+
+@using (Html.BeginForm("CreateOrder" ,"Order", FormMethod.Post))
+{
+
+    @Html.AntiForgeryToken()
+    <div class="row" style="padding-top: 150px">
+ 
+
+        <h2 id="H2U" >@UTW_Project.Resources.MyTexts.UpdateOrder</h2>
+        <h4 id="H4U">
+            @UTW_Project.Resources.MyTexts.QuantityNotStock
+        </h4>
+        <h2 id="H2A">@UTW_Project.Resources.MyTexts.AddOrder</h2>
+        
+        <div>
+            @Html.RadioButton("Order", 0, true, new { id = "Add", @onchange = "Check();",@onstart="Check();" })
+            @Html.Label(@UTW_Project.Resources.MyTexts.AddOrder)
+            @Html.RadioButton("Order",1,new { id="update",@onchange="Check();"})
+            @Html.Label(@UTW_Project.Resources.MyTexts.UpdateOrder)
+       </div>
+
+        <div class="col"id="Drop">
+            @Html.Label(@UTW_Project.Resources.MyTexts.StockName)
+            @Html.DropDownListFor(c => c.StockID, (ViewBag.Stocks as SelectList),"", new { id = "Stockname", @class = "form-control", @onchange = "OrderPrice();" })
+            @Html.ValidationMessage("CompanyName", new { @class = "text-danger" })
+        </div>
+
+        <div class="col">
+            @Html.Label(@UTW_Project.Resources.MyTexts.StockQuantity)
+            @Html.TextBoxFor(m => m.OrderQuantity, new {type="number", id = "Quantity", @class = "form-control", @onchange = "OrderPrice();" })
+        </div>
+
+        <div class="col">
+            @Html.Label(@UTW_Project.Resources.MyTexts.OrderPrice)
+            @Html.LabelFor(c => c.OrderPrice,Convert.ToString(Model.OrderPrice), new { id = "Price" })
+        </div>
+        <div class="col" id="date">
+            @Html.Label(@UTW_Project.Resources.MyTexts.OrderDate)
+            @Html.Label(Model.OrderDate.ToString())
+        </div>
+
+        <div id="Type">
+            @Html.RadioButtonFor(r => r.OrderType, 1)
+            @Html.Label(@UTW_Project.Resources.MyTexts.Buy)
+            @Html.RadioButtonFor(r => r.OrderType, 0)
+            @Html.Label(@UTW_Project.Resources.MyTexts.Sell)
+
+
+        </div>
+
+
+        <div class="form-group">
+            <input type="submit" value=@UTW_Project.Resources.MyTexts.AddOrder id="addbtn" class="btn btn-default" />
+            
+            
+                @Html.ActionLink(@UTW_Project.Resources.MyTexts.UpdateOrder, "EditOrder", "Order", new { OrderID=(Model.OrderID+9876), ordertype=Model.OrderType, ClientID=(Model.ClientID+9876) ,StockID=(Model.StockID + 9876),OrderQ=-1 }, new {@class= "btn btn-default",id="Updatebtn" })
+
+            
+        </div>
+
+
+
+
+    </div>
+}
+@using (Html.BeginForm(@UTW_Project.Resources.MyTexts.Search, "Order", new { OrderID = Model.OrderID }, FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    <div class="form-group" style="padding-bottom: 30px" id="2ndform">
+        
+        @Html.LabelFor(m=>m.OrderID)
+        @Html.EditorFor(model => model.OrderID, new { @class = "form-control", type = "number", id = "OrderID" })
+        <div class="form-group">
+            <input type="submit" value=@UTW_Project.Resources.MyTexts.Search
+                    class="btn btn-default" />
+        </div>
+
+    </div>
+
+}
+@section scripts{
+    <script type="text/javascript">
+
+    
+
+
+        function OrderPrice() {
+
+            $.ajax({
+                url: "http://localhost:39134/Order/getPrice?id=" + $("#Stockname").val(),
+                success: function (result) {
+                    var QuantityOfOrder = parseFloat($("#Quantity").val());
+                    var r = parseInt(result);
+                    var x = (r * QuantityOfOrder) +"";
+                    document.getElementById("Price").innerHTML = x;
+                    
+                },
+                error: function (result) {
+                    document.getElementById("Price").innerHTML = result;
+                    
+                }
+
+            })
+
+
+        }
+        $(document).ready(function ()
+        {
+            if (@Model.OrderID != 0)
+                { 
+                $("#update").prop("checked", true);
+                }
+                Check();
+                OrderPrice();
+
+            })
+        $("#Updatebtn").hover(function ()
+        
+        {
+
+            var str = $("#Quantity").val();
+            var newURL = $("#Updatebtn").prop('href').replace('-1', str);
+            $("#Updatebtn").prop('href', newURL);
+            
+        }
+        )
+
+        function Check() {
+            if ($("#Add").is(':checked'))
+            {
+                $("#Type").show();
+                $("#H2U").hide();
+                $("#H4U").hide();
+                $("#H2A").show();
+                $("#2ndform").hide();
+                $("#Updatebtn").hide();
+                $("#addbtn").show();
+                $("#date").hide();
+            }
+            if ($("#update").is(':checked'))
+            {
+                $("#Type").hide();
+                $("#H2U").show();
+                $("#H4U").show();
+                $("#H2A").hide();
+                $("#2ndform").show();
+                $("#Updatebtn").show();
+                $("#addbtn").hide();
+                $("#date").show();
+            }
+        }  
+
+        
+
+    </script>
+}

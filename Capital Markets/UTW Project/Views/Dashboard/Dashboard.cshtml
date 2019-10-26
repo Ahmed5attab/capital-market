@@ -1,0 +1,178 @@
+﻿@model UTW_Project.Models.OrdersData
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="" style="background-color:#313131; margin-top:80px" id="Chart">
+    <div id="container" style="min-width: 310px; height: 380px; max-width: 600px;margin-left:23%; padding-top:2% ;">
+
+    </div>
+    <label id="value" style="color:deepskyblue; font-size:16px ;margin:50px"></label>
+</div>
+
+
+<div style="padding-top: 100px; position:center; display:none " class="panel-heading" id="noshares"><h1>You Have No Shares</h1></div>
+
+
+<div class="form-group" style="display:inline-flex">
+@if (Model.order.Count() != 0)
+{
+    <fieldset>
+        <legend> <div style="padding-top:100px" class="panel-heading"> <h2>@UTW_Project.Resources.MyTexts.TodayOrders</h2> </div> </legend>
+
+        <div class="panel" style="border:50px; border-color:black; background-color:#dddddd; border-radius:10px">
+            <div class="panel-body">
+                <table id="Table1" class="table table-bordered table-striped table-hover table-list-search table-bordered">
+                    <thead>
+                        <tr>
+                            <th>@UTW_Project.Resources.MyTexts.StockName</th>
+                            <th>@UTW_Project.Resources.MyTexts.OrderType</th>
+                            <th>@UTW_Project.Resources.MyTexts.OrderDate</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.order != null)
+                        {
+                            foreach (var item in Model.order)
+                            {
+                                <tr class="contact hover" data-toggle="modal">
+                                    <td>@item.Stock.CompanyName</td>
+                                    @if (item.OrderType != 1)
+                                    {
+                                        <td>SELL</td>
+                                    }
+                                    else
+                                    {
+                                        <td>BUY</td>
+                                    }
+                                    <td>@item.OrderDate</td>
+                                    <td class="text-center"><btton class="btn btn-info">@Html.ActionLink("Update", "PieChart", "PieChart", new { id = @item.OrderID })</btton></td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </fieldset>
+
+    }
+    else
+    {
+    <div style="padding-top: 100px; position:center" class="panel-heading"><h1>@UTW_Project.Resources.MyTexts.NoOrders</h1></div>
+    }
+    <fieldset style="margin-left:10%" id="div_Stocks">
+        <legend><div style="padding-top: 100px" class="panel-heading"><h2>@UTW_Project.Resources.MyTexts.TodayStockPrices</h2></div></legend>
+        <div id="stockTable" class="panel" style="width:600px; background-color:#dddddd; border-radius:10px">
+            <div class="panel-body">
+                <table id="Table2" class="table table-bordered table-striped table-hover  table-bordered">
+                    <thead>
+                        <tr>
+                            <th>@UTW_Project.Resources.MyTexts.StockPic</th>
+                            <th>@UTW_Project.Resources.MyTexts.StockName</th>
+                            <th>@UTW_Project.Resources.MyTexts.StockPrice</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var Sitem in Model.stock)
+                        {
+                            <tr>
+                                <td><img src="~/Stock_Img/@Sitem.ImageURL" width="70" height="60" /></td>
+                                <td>@Sitem.CompanyName</td>
+                                <td>@Sitem.Price</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </fieldset>
+</div>
+@section scripts{
+
+    <script>
+
+        // Today's Orders AND Stocks prices Table Adjast
+        $(document).ready(function () {
+            $('#Table1').DataTable();
+            $('#Table2').DataTable();
+        });
+
+
+
+        // Radialize the colors
+        Highcharts.setOptions({
+            colors: Highcharts.map(Highcharts.getOptions().colors, function (color) {
+                return {
+                    radialGradient: {
+                        cx: 0.5,
+                        cy: 0.3,
+                        r: 0.7
+                    },
+                    stops: [
+                      [0, color],
+                      [1, Highcharts.Color(color).brighten(-0.3).get('rgb')] // darken
+                    ]
+                };
+            })
+        });
+
+        // Build the chart
+        $(document).ready(function () {
+            $.getJSON("/Dashboard/Pie", function (data) {
+                var dataArray = [];
+                var total = 0;
+                $.each(data, function (i, obj) {
+                    dataArray.push(obj);
+                    total = total + obj.y;
+                });
+                if (!total) {
+                    $("#Chart").hidden;
+                    $("#noshares").show;
+                }
+                $("#value").html("Total Shares Value:   " + total + "$");
+                Highcharts.chart('container', {
+                    chart: {
+                        plotBackgroundColor: null,
+                        plotBorderWidth: null,
+                        plotShadow: false,
+                        type: 'pie'
+                    },
+                    title: {
+                        text: 'Your Shares Evaluation'
+                    },
+                    tooltip: {
+                        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                    },
+                    plotOptions: {
+                        pie: {
+                            allowPointSelect: true,
+                            cursor: 'pointer',
+                            dataLabels: {
+                                enabled: true,
+                                format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                                style: {
+                                    color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                                },
+                                connectorColor: 'deepskyblue'
+                            }
+                        }
+                    },
+                    series: [{
+                        name: 'Value',
+                        data:
+                            dataArray
+
+
+
+                    }]
+                });
+
+            });
+        });
+    </script>
+}
+
+

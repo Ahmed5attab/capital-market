@@ -1,0 +1,235 @@
+﻿@model UTW_Project.Models.OrdersData
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+
+}
+@if (Model.order.Count() != 0 || ViewBag.there == 1)
+{
+    <div style="padding-top: 100px" class="panel-heading"><h1>@UTW_Project.Resources.MyTexts.ALLOrders</h1></div>
+
+
+
+    <div class="panel" style="border:50px;  border-color:black; background-color:#dddddd; border-radius:10px">
+        <div class="panel-body">
+            <table id="myTable" class="table table-bordered table-striped table-hover table-list-search table-bordered">
+                <thead>
+                    <tr>
+                        @if (Model.user != null)
+                        {
+                            <th>@UTW_Project.Resources.MyTexts.UserName</th>
+                        }
+                        else
+                        {
+                            <th>@UTW_Project.Resources.MyTexts.StockNum</th>
+                        }
+                        <th>@UTW_Project.Resources.MyTexts.StockName</th>
+                        <th>@UTW_Project.Resources.MyTexts.OrderDate</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.order != null)
+                    {
+                        foreach (var item in Model.order)
+                        {
+                            <tr class="contact hover" data-toggle="modal" data-target="#@item.OrderID">
+                                @if (Model.user != null)
+                                {
+                                    <td>@item.Person.UserName</td>
+                                }
+                                else
+                                {
+                                    <td>@item.StockID</td>
+                                }
+                                <td>@item.Stock.CompanyName</td>
+                                <td>@item.OrderDate.Month/@item.OrderDate.Day/@item.OrderDate.Year</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+            <div class="form-inline" style="padding:15px;">
+                <form action="OrdersDate" method="post" style="padding-top:20px; display:inline ;" class="form-group-lg ">
+
+                    @if (Model.user != null)
+                {
+                        <label font-size:20px;>@UTW_Project.Resources.MyTexts.SelectUser </label>
+                        <select id="users" name="username" style='display:inline-block; background-color:#3ec1d5;' class="btn btn-info">
+                            @if (ViewBag.username != null)
+                    {
+                                <option value="All Users">@UTW_Project.Resources.MyTexts.AllUsers</option>
+                                foreach (var item in Model.user)
+                                {
+                                    if (ViewBag.username == item.UserName)
+                                    {
+                                        <option value="@item.UserName" selected="selected">@item.UserName</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@item.UserName">@item.UserName</option>
+                                    }
+                                }
+
+                            }
+                            else
+                            {
+                                <option value="All Users" selected="selected">@UTW_Project.Resources.MyTexts.AllUsers</option>
+                                foreach (var item in Model.user)
+                                {
+                                    <option value="@item.UserName">@item.UserName</option>
+                                }
+                            }
+                        </select>
+                    }
+
+                    <label style="padding-left:10px;  font-size:20px; ">@UTW_Project.Resources.MyTexts.Stock </label>
+                    <select id='stocks' name="stockName" style="display:inline-block; background-color:#3ec1d5" class="btn btn-info">
+                        @if (ViewBag.stock != null)
+                        {
+                            <option value="All Stocks">@UTW_Project.Resources.MyTexts.AllStocks</option>
+                            foreach (var item in Model.stock)
+                            {
+                                if (ViewBag.stock == item.CompanyName)
+                                {
+                                    <option value="@item.CompanyName" selected="selected">@item.CompanyName</option>
+                                }
+                                else
+                                {
+                                    <option value="@item.CompanyName">@item.CompanyName</option>
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <option value="All Stocks" selected="selected">@UTW_Project.Resources.MyTexts.AllStocks</option>
+                            foreach (var item in Model.stock)
+                            {
+                                <option value="@item.CompanyName">@item.CompanyName</option>
+                            }
+                        }
+                    </select>
+
+                    <label style="padding-left:10px; font-size:20px; ">@UTW_Project.Resources.MyTexts.StartDate </label>
+                    @if (ViewBag.start != null)
+                {
+                        <input type="text" style="border-color:deepskyblue" class="text-center" readonly="readonly" id="start" name="start" placeholder="MM/DD/YYYY" value="@ViewBag.start.Month/@ViewBag.start.Day/@ViewBag.start.Year" />
+                    }
+                    else
+                    {
+                        <input type="text" style="border-color:deepskyblue" class="text-center" readonly="readonly" id="start" name="start" placeholder="MM/DD/YYYY" />
+                    }
+
+                    <label style="padding-left:10px;  font-size:20px; "> @UTW_Project.Resources.MyTexts.EndDate </label>
+                    @if (ViewBag.end != null)
+                {
+                        <input type="text" style="border-color:deepskyblue" readonly="readonly" class="text-center" id="end" name="end" placeholder="MM/DD/YYYY" value="@ViewBag.end.Month/@ViewBag.end.Day/@ViewBag.end.Year" />
+                    }
+                    else
+                    {
+                        <input type="text" style="border-color:deepskyblue" class="text-center" readonly="readonly" id="end" name="end" placeholder="MM/DD/YYYY" />
+                    }
+
+                    <input type="submit" value=@UTW_Project.Resources.MyTexts.Filter class="btn btn-info" style="background-color:#3ec1d5" id="Date" />
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+    if (Model.order != null)
+    {
+        foreach (var item in Model.order)
+        {
+            <div id="@item.OrderID" class="modal fade">
+                <div class="modal-dialog">
+                    <div class="modal-header"></div>
+                    <div class="modal-body" style="background-color:deepskyblue; height:40%">
+                        <h3>@UTW_Project.Resources.MyTexts.OrderNo @item.OrderID</h3>
+                        <div style="background-color:skyblue">
+                        <div style="display:inline-block ">                     
+                            <h5>@UTW_Project.Resources.MyTexts.StockName @item.Stock.CompanyName</h5>
+                            <h5>@UTW_Project.Resources.MyTexts.StockPrice @item.Stock.Price $</h5>
+                            <h5>@UTW_Project.Resources.MyTexts.StockQuantity @item.OrderQuantity</h5>
+                            <h5>@UTW_Project.Resources.MyTexts.Total @item.OrderPrice $</h5>
+                            @if (item.OrderType == 0)
+                            {
+                                <h6>@UTW_Project.Resources.MyTexts.Type @UTW_Project.Resources.MyTexts.Sell</h6>
+                            }
+                            else
+                            {
+                                <h5>@UTW_Project.Resources.MyTexts.Type @UTW_Project.Resources.MyTexts.Buy</h5>
+                            }
+                        </div>
+                        <img src="~/Stock_Img/@item.Stock.ImageURL" width="200" height="250" style="margin-bottom:100px" />
+                    </div>
+                        </div>
+                    <div class="modal-footer">
+                        
+                    </div>
+                </div>
+            </div>
+        }
+    }
+
+}
+else
+{
+    <div class="row">
+        <div style="padding-top:100px;" class="col-md-offset-2 col-md-8 col-sm-offset-2 col-sm-8">
+
+            <h1 style="text-align:center" class="heading color-white">@UTW_Project.Resources.MyTexts.YouHaveNoOrders</h1>
+
+        </div>
+    </div>
+}
+
+@section scripts{
+
+    <script>
+        $(document).ready(function () {
+            $('#myTable').DataTable();
+
+        });
+
+
+
+
+        function Popup(orderID) {
+            $("#" + orderID).dialog({
+
+                modal: true,
+
+            });
+            $("#" + orderID).position({
+                my: "center",
+                at: "center",
+                of: window
+            });
+
+
+
+        }
+
+        var picker = new Pikaday(
+        {
+            field: document.getElementById('start'),
+            firstDay: 5,
+            minDate: new Date('2018-01-01'),
+            maxDate: new Date('2038-12-31'),
+            yearRange: [2018, 2038],
+            numberOfMonths: 1,
+            theme: 'dark-theme'
+        });
+        var picker = new Pikaday(
+        {
+            field: document.getElementById('end'),
+            firstDay: 5,
+            minDate: new Date('2018-01-01'),
+            maxDate: new Date('2038-12-31'),
+            yearRange: [2018, 2038],
+            numberOfMonths: 1,
+            theme: 'dark-theme'
+        });
+    </script>
+}

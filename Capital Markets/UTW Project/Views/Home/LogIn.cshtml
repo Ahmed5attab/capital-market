@@ -1,0 +1,49 @@
+﻿@model UTW_Project.Models.PersonLoginModel
+@using CaptchaMvc.HtmlHelpers;
+
+@{
+    ViewBag.Title = "LogIn";
+}
+
+
+@using (Html.BeginForm("LogIn", "Home", FormMethod.Post, new { @class = "form-group" }))
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal" style="padding-top : 100px">
+        <div class="form-group warning danger">
+            <h2 class="text-danger">@ViewData["message"]</h2>
+        </div>
+        <h3 style="color:green">@ViewBag.MsgTrue</h3>
+        <div class="form-group">
+            @Html.LabelFor(model => model.UserName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.UserName, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.UserName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Password, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.PasswordFor(model => model.Password, new { @class = "form-control", placeholder = "Password" })
+                @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+            </div>
+            @if (ViewBag.show != null)
+            {
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10"> &nbsp</div>
+                    @Html.Captcha(5)
+                </div>
+            }
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10" style="padding-top : 15px">
+                    <input type="submit" value=@UTW_Project.Resources.MyTexts.LogIn class="btn btn-default" />
+                    @Html.ActionLink(@UTW_Project.Resources.MyTexts.ResetPassword, "PasswordReset", "Home", new { @class = "btn btn-default" })
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

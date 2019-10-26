@@ -1,0 +1,149 @@
+﻿@model UTW_Project.ViewModels.UsersFilterViewModel
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<br />
+<br />
+<br />
+<br />
+
+<p>
+    @using (Html.BeginForm("Index", "Admin", FormMethod.Get, new { @class = "form-control" }))
+    {
+        <text>  @UTW_Project.Resources.MyTexts.FilterBy </text>
+        @Html.LabelFor(m => m.Filter.UserName)
+        @Html.TextBoxFor(m => m.Filter.UserName)
+
+        @Html.LabelFor(m => m.Filter.Email)
+        @Html.TextBoxFor(m => m.Filter.Email)
+
+        @Html.LabelFor(m => m.Filter.IsLocked)
+        @Html.TextBoxFor(m => m.Filter.IsLocked)
+
+
+        <input type="submit" value=@UTW_Project.Resources.MyTexts.Filter  />
+    }
+
+</p>
+
+
+<table class="table table-striped">
+    <tr>
+
+        <th>
+            @Html.DisplayNameFor(model => model.Persons.FirstOrDefault().UserName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Persons.FirstOrDefault().Email)
+        </th>
+
+
+
+        <th>
+            @Html.DisplayNameFor(model => model.Persons.FirstOrDefault().IsLocked)
+        </th>
+
+
+
+        <th></th>
+    </tr>
+
+    @if (Model.Persons.Count() == 0)
+    {
+        <tr>
+            <td >
+                <h3>
+                    @UTW_Project.Resources.MyTexts.NoResults
+                </h3>
+            </td>
+        </tr>
+    }
+
+    @foreach (var item in Model.Persons)
+    {
+        if (item.IsLocked == 0)
+        {
+
+            <tr class="success">
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.UserName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Email)
+                </td>
+
+                <td>
+
+
+                    @if (item.IsLocked == 0)
+                    {
+                        <span style="color:green">@UTW_Project.Resources.MyTexts.Active</span>
+                    }
+                    else
+                    {
+                        <span style="color:red">@UTW_Project.Resources.MyTexts.Blocked</span>
+                    }
+                </td>
+
+                <td>
+                    @if (item.IsLocked == 0)
+                    {
+                        //<button name="Block" style="color:red"></button>
+                        @Html.ActionLink(@UTW_Project.Resources.MyTexts.Block, "Edit", new { id = item.ID }, new { @class = "btn btn-danger" })
+
+                    }
+                    else
+                    {
+                        @Html.ActionLink(@UTW_Project.Resources.MyTexts.UnBlock, "Edit", new { id = item.ID }, new { @class = "btn btn-success" })
+                    }
+
+
+                </td>
+            </tr>
+        }
+        else
+        {
+            <tr class="danger">
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.UserName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Email)
+                </td>
+
+                <td>
+
+
+                    @if (item.IsLocked == 0)
+                    {
+                        <span style="color:green">@UTW_Project.Resources.MyTexts.Active</span>
+                    }
+                    else
+                    {
+                        <span style="color:red">@UTW_Project.Resources.MyTexts.Blocked</span>
+                    }
+                </td>
+
+                <td>
+                    @if (item.IsLocked == 0)
+                    {
+                        //<button name="Block" style="color:red"></button>
+                        @Html.ActionLink(@UTW_Project.Resources.MyTexts.Block, "Edit", new { id = item.ID })
+
+                    }
+                    else
+                    {
+                        @Html.ActionLink(@UTW_Project.Resources.MyTexts.UnBlock, "Edit", new { id = item.ID }, new { @class = "btn btn-success" })
+                    }
+                </td>
+            </tr>
+        }
+    }
+    
+</table>
+
